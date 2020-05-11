@@ -8,8 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "tipoProduto")
-public class TipoModel {
+@Table(name = "categorias")
+public class CategoriasModel {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +33,8 @@ public class TipoModel {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
+	
+	
 	
 	
 
