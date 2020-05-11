@@ -22,9 +22,9 @@ public class ProdutosModel {
 	@Column(name = "cor")
 	private String cor;
 	
-	private CategoriaModel categoria;
+	//private CategoriaModel categoria;
 	
-	private TipoModel tipo;
+	//private TipoModel tipo;
 
 	public int getId() {
 		return id;
@@ -46,7 +46,7 @@ public class ProdutosModel {
 		this.cor = cor;
 	}
 
-	public CategoriaModel getCategoria() {
+	/*public CategoriaModel getCategoria() {
 		return categoria;
 	}
 
@@ -60,7 +60,7 @@ public class ProdutosModel {
 
 	public void setTipo(TipoModel tipo) {
 		this.tipo = tipo;
-	}
+	}*/
 	
 	
 		

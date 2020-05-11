@@ -16,5 +16,5 @@ public class CategoriaModel {
 	@Column(name= "id")
 	private int id;
 
-	private String nome;
+	//private String nome;
 }
