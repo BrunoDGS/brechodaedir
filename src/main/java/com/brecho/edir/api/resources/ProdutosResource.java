@@ -1,6 +1,5 @@
 package com.brecho.edir.api.resources;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,14 +8,16 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.brecho.edir.api.event.RecursoCriadoEvent;
 import com.brecho.edir.api.model.CategoriasModel;
 import com.brecho.edir.api.model.ProdutosModel;
 import com.brecho.edir.api.model.TipoModel;
@@ -36,17 +37,17 @@ public class ProdutosResource {
 	@Autowired
 	private CategoriasRepository categorias;
 	
+	@Autowired
+	private ApplicationEventPublisher publisher;
+	
 	@Transactional
 	@PostMapping("/produtos")
 	public ResponseEntity<ProdutosModel> salvar(@Valid @RequestBody ProdutosModel produto, HttpServletResponse response) {
 			ProdutosModel produtoSalvo = produtos.save(produto);
 			
-			URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}")
-					.buildAndExpand(produtoSalvo.getId()).toUri();
+			publisher.publishEvent(new RecursoCriadoEvent(this, response, produtoSalvo.getId()));
 			
-			response.addHeader("Location", uri.toASCIIString());
-			
-			return ResponseEntity.created(uri).body(produtoSalvo);
+			return ResponseEntity.status(HttpStatus.CREATED).body(produtoSalvo);
 		
 	}	
 
@@ -55,26 +56,20 @@ public class ProdutosResource {
 	public ResponseEntity<TipoModel> salvar(@Valid @RequestBody TipoModel tipo, HttpServletResponse response) {
 			TipoModel tipoSalvo = tipos.save(tipo);
 			
-			URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}")
-					.buildAndExpand(tipoSalvo.getId()).toUri();
+			publisher.publishEvent(new RecursoCriadoEvent(this, response, tipoSalvo.getId()));
 			
-			response.addHeader("Location", uri.toASCIIString());
-			
-			return ResponseEntity.created(uri).body(tipoSalvo);
+			return ResponseEntity.status(HttpStatus.CREATED).body(tipoSalvo);
 		
 	}
 	
 	@Transactional
 	@PostMapping("/produtos/categorias")
 	public ResponseEntity<CategoriasModel> salvar(@Valid @RequestBody CategoriasModel categoria, HttpServletResponse response) {
-		CategoriasModel categoriaSalvo = categorias.save(categoria);
+		CategoriasModel categoriaSalva = categorias.save(categoria);
 			
-			URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}")
-					.buildAndExpand(categoriaSalvo.getId()).toUri();
-			
-			response.addHeader("Location", uri.toASCIIString());
+		publisher.publishEvent(new RecursoCriadoEvent(this, response, categoriaSalva.getId()));
 		
-			return ResponseEntity.created(uri).body(categoriaSalvo);
+		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
 	}
 		
 	@GetMapping("/produtos/{id}")
@@ -87,6 +82,13 @@ public class ProdutosResource {
 	public List<ProdutosModel> listar(){
 		
 		return produtos.findAll();
+		
+	}
+	
+	@GetMapping("/produtos/categorias")
+	public List<CategoriasModel> listarCategoria(){
+		
+		return categorias.findAll();
 		
 	}
 
