@@ -16,7 +16,7 @@ import com.brecho.edir.api.repository.InformativosRepository;
 public class InformativosResource {
 	
 	@Autowired
-	InformativosRepository informativosRepository;
+	private InformativosRepository informativosRepository;
 	
 	@Transactional
 	@PostMapping("/informativos")

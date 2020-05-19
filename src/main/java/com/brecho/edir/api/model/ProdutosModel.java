@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -34,12 +36,14 @@ public class ProdutosModel {
 	private String marca;
 	
 	@NotNull
-	@Column(name = "idcategoria")
-	private int categoria;
+	@JoinColumn(name = "idcategoria")
+	@ManyToOne
+	private CategoriasModel categoria;
 	
 	@NotNull
-	@Column(name = "idtipo")
-	private int tipo;
+	@JoinColumn(name = "idtipo")
+	@ManyToOne
+	private TipoModel tipo;
 
 	public int getId() {
 		return id;
@@ -81,19 +85,20 @@ public class ProdutosModel {
 		this.marca = marca;
 	}
 
-	public int getCategoria() {
+	
+	public CategoriasModel getCategoria() {
 		return categoria;
 	}
 
-	public void setCategoria(int categoria) {
+	public void setCategoria(CategoriasModel categoria) {
 		this.categoria = categoria;
 	}
 
-	public int getTipo() {
+	public TipoModel getTipo() {
 		return tipo;
 	}
 
-	public void setTipo(int tipo) {
+	public void setTipo(TipoModel tipo) {
 		this.tipo = tipo;
 	}
 	

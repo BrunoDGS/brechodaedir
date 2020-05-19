@@ -14,82 +14,65 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.brecho.edir.api.event.RecursoCriadoEvent;
-import com.brecho.edir.api.model.CategoriasModel;
 import com.brecho.edir.api.model.ProdutosModel;
-import com.brecho.edir.api.model.TipoModel;
-import com.brecho.edir.api.repository.CategoriasRepository;
 import com.brecho.edir.api.repository.ProdutosRepository;
-import com.brecho.edir.api.repository.TipoRepository;
+import com.brecho.edir.api.service.ProdutosService;
 
 @RestController
+@RequestMapping("/produtos")
 public class ProdutosResource {
-	
+
 	@Autowired
-	private ProdutosRepository produtos;
-	
-	@Autowired
-	private TipoRepository tipos;
-	
-	@Autowired
-	private CategoriasRepository categorias;
-	
+	private ProdutosRepository produtosRepository;
+
 	@Autowired
 	private ApplicationEventPublisher publisher;
 	
-	@Transactional
-	@PostMapping("/produtos")
-	public ResponseEntity<ProdutosModel> salvar(@Valid @RequestBody ProdutosModel produto, HttpServletResponse response) {
-			ProdutosModel produtoSalvo = produtos.save(produto);
-			
-			publisher.publishEvent(new RecursoCriadoEvent(this, response, produtoSalvo.getId()));
-			
-			return ResponseEntity.status(HttpStatus.CREATED).body(produtoSalvo);
-		
-	}	
+	@Autowired
+	private ProdutosService produtosService;
 
 	@Transactional
-	@PostMapping("/produtos/tipos")
-	public ResponseEntity<TipoModel> salvar(@Valid @RequestBody TipoModel tipo, HttpServletResponse response) {
-			TipoModel tipoSalvo = tipos.save(tipo);
-			
-			publisher.publishEvent(new RecursoCriadoEvent(this, response, tipoSalvo.getId()));
-			
-			return ResponseEntity.status(HttpStatus.CREATED).body(tipoSalvo);
-		
-	}
-	
-	@Transactional
-	@PostMapping("/produtos/categorias")
-	public ResponseEntity<CategoriasModel> salvar(@Valid @RequestBody CategoriasModel categoria, HttpServletResponse response) {
-		CategoriasModel categoriaSalva = categorias.save(categoria);
-			
-		publisher.publishEvent(new RecursoCriadoEvent(this, response, categoriaSalva.getId()));
-		
-		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
-	}
-		
-	@GetMapping("/produtos/{id}")
-	public Optional<ProdutosModel> buscarPeloId(@PathVariable Integer id) {
-		return produtos.findById(id);
-	}
-	
-	
-	@GetMapping("/produtos")
-	public List<ProdutosModel> listar(){
-		
-		return produtos.findAll();
-		
-	}
-	
-	@GetMapping("/produtos/categorias")
-	public List<CategoriasModel> listarCategoria(){
-		
-		return categorias.findAll();
-		
+	@PostMapping
+	public ResponseEntity<ProdutosModel> salvar(@Valid @RequestBody ProdutosModel produto,
+			HttpServletResponse response) {
+		ProdutosModel produtoSalvo = produtosRepository.save(produto);
+
+		publisher.publishEvent(new RecursoCriadoEvent(this, response, produtoSalvo.getId()));
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(produtoSalvo);
+
 	}
 
+	@Transactional
+	@GetMapping
+	public List<ProdutosModel> listar() {
+
+		return produtosRepository.findAll();
+
+	}
+
+	@Transactional
+	@GetMapping("/{id}")
+	public ResponseEntity<?> buscarPeloId(@PathVariable Integer id) {
+
+		Optional<ProdutosModel> produtoRecuperado = produtosRepository.findById(id);
+
+		return produtoRecuperado.isPresent() ? ResponseEntity.status(HttpStatus.OK).body(produtoRecuperado)
+				: ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	}
+
+	@Transactional
+	@PutMapping("/{id}")
+	public ResponseEntity<ProdutosModel> atualizar(@PathVariable Integer id, @Valid @RequestBody ProdutosModel produto){
+		
+		ProdutosModel produtoRecuperado = produtosService.salvar(id, produto);		
+		return ResponseEntity.ok(produtoRecuperado);
+		
+	}
 }

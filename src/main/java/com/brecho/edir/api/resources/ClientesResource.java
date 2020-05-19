@@ -17,7 +17,7 @@ import com.brecho.edir.api.repository.ClientesRepository;
 public class ClientesResource {
 	
 	@Autowired
-	ClientesRepository repository;
+	private ClientesRepository repository;
 	
 	@Transactional
 	@PostMapping("/clientes/fisica")
